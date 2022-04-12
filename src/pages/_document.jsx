@@ -12,6 +12,7 @@ class MyDocument extends Document {
       <Html lang="en-US">
         <Head>
           <link rel="stylesheet" href="/css/styles.css" />
+          <title>Calculator</title>
         </Head>
         <body>
           <Main />

@@ -12,15 +12,18 @@ function Home() {
   const [chosenItem, setChosenItem] = useState({});
   const [value, setValue] = useState('');
 
+  const populateItems = () =>
+    setItems(
+      [...indexedAppliances.map((appl) => ({ ...appl }))],
+      ...indexedTools.map((tls) => ({ ...tls })),
+      ...indexPumpAndAirConditioners.map((pac) => ({ ...pac })),
+    );
+
   useEffect(() => {
     let isMounted = true;
 
     if (isMounted) {
-      setItems(
-        [...indexedAppliances.map((appl) => ({ ...appl }))],
-        ...indexedTools.map((tls) => ({ ...tls })),
-        ...indexPumpAndAirConditioners.map((pac) => ({ ...pac })),
-      );
+      populateItems();
     }
 
     return () => {
@@ -33,8 +36,6 @@ function Home() {
 
     // check if id exists in selected items
     const exists = selectedItems.some((si) => si?.id === id);
-
-    console.log('item', exists);
 
     if (exists) return;
 
@@ -55,8 +56,19 @@ function Home() {
     setSelectedItems(selectedItems.filter((s) => s?.id !== id));
   };
 
-  const searchItem = (keyword) =>
-    setItems(items.filter((i) => itemTypeHandler(i).includes(keyword)));
+  const searchItem = (keyword) => {
+    if (!keyword) {
+      populateItems();
+      return;
+    }
+
+    setItems(
+      items.filter(
+        (i) =>
+          itemTypeHandler(i).toLowerCase().indexOf(keyword.toLowerCase()) > -1,
+      ),
+    );
+  };
 
   return (
     <main id="wrapper">
@@ -66,7 +78,10 @@ function Home() {
           <input
             type="text"
             className="input"
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => {
+              setValue(e.target.value);
+              searchItem(e.target.value);
+            }}
             value={value}
           />
           <button className="btn btn-primary" onClick={() => searchItem(value)}>
