@@ -263,6 +263,9 @@ body {
   background-color: var(--black);
   border-radius: 8px;
   flex: 1;
+  width: 100%;
+  border: none;
+  outline: none;
 }
 
 .specs-box span:first-of-type {

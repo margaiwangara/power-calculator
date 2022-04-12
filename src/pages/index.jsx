@@ -6,11 +6,24 @@ import {
 import { APPLIANCE, TOOL, PACS } from '../utils/types';
 import { useState, useEffect, useCallback } from 'react';
 
+const DEFAULT_INFO = {
+  power: 0,
+  current: 0,
+  voltage: 0,
+  amount: 1,
+  hoursPerDay: 1,
+  daysOffGrid: 1,
+};
 function Home() {
   const [items, setItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [chosenItem, setChosenItem] = useState({});
   const [value, setValue] = useState('');
+  const [info, setInfo] = useState(DEFAULT_INFO);
+  const [calculation, setCalculation] = useState({
+    total: 0,
+    single: 0,
+  });
 
   const populateItems = () =>
     setItems(
@@ -69,6 +82,31 @@ function Home() {
       ),
     );
   };
+
+  const populateInfo = (e) => {
+    setInfo({ ...info, [e.target.name]: e.target.value });
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const { power, hoursPerDay, amount, current, voltage } = info;
+
+    setInfo({ ...info, power: current * voltage });
+
+    setCalculation({ ...info, total: power * hoursPerDay * amount });
+    // setChosenItem({ ...chosenItem, totalPower: power * hoursPerDay * amount });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    info?.power,
+    info?.hoursPerDay,
+    info?.amount,
+    info?.current,
+    info?.voltage,
+  ]);
 
   return (
     <main id="wrapper">
@@ -142,47 +180,91 @@ function Home() {
               <h6 className="title">Specification</h6>
               <div className="specs">
                 <span>Power:</span>
-                <span className="specs-value"> 1515 </span>
+                <input
+                  type="number"
+                  className="specs-value"
+                  value={info.power}
+                  onChange={populateInfo}
+                  name="power"
+                />
+                {/* <span className="specs-value"> 1515 </span> */}
                 <span>W</span>
               </div>
               <div className="specs">
                 <span>Current:</span>
-                <span className="specs-value"> 13.75 </span>
+                <input
+                  type="number"
+                  className="specs-value"
+                  value={info.current}
+                  onChange={populateInfo}
+                  name="current"
+                />
+                {/* <span className="specs-value"> 13.75 </span> */}
                 <span>A</span>
               </div>
               <div className="specs">
                 <span>Voltage:</span>
-                <span className="specs-value"> 110 </span>
+                <input
+                  type="number"
+                  className="specs-value"
+                  value={info.voltage}
+                  onChange={populateInfo}
+                  name="voltage"
+                />
+                {/* <span className="specs-value"> 110 </span> */}
                 <span>V</span>
               </div>
             </div>
             <div className="specs-box">
               <div className="specs">
                 <span>Amount:</span>
-                <span className="specs-value">4</span>
+                <input
+                  type="number"
+                  className="specs-value"
+                  value={info.amount}
+                  onChange={populateInfo}
+                  name="amount"
+                />
+                {/* <span className="specs-value">4</span> */}
               </div>
             </div>
             <div className="specs-box">
               <div className="specs">
                 <span>Hours Per Day:</span>
-                <span className="specs-value">1</span>
+                <input
+                  type="number"
+                  className="specs-value"
+                  value={info.hoursPerDay}
+                  onChange={populateInfo}
+                  name="hoursPerDay"
+                />
+                {/* <span className="specs-value">1</span> */}
               </div>
             </div>
             <div className="specs-box">
               <div className="specs">
                 <span>Days Of Off-Grid:</span>
-                <span className="specs-value">1</span>
+                <input
+                  type="number"
+                  className="specs-value"
+                  value={info.daysOffGrid}
+                  onChange={populateInfo}
+                  name="daysOffGrid"
+                />
+                {/* <span className="specs-value">1</span> */}
               </div>
               <div className="specs total-specs">
                 <span>Total Power Consumption:</span>
-                <span className="total">15120 Wh</span>
+                <span className="total">{calculation?.total} Wh</span>
               </div>
               <div className="specs">
                 <ul className="list-of-items">
-                  <li>
-                    <span>Air Conditioner - </span>
-                    <span>3000 Wh</span>
-                  </li>
+                  {selectedItems?.map((s) => (
+                    <li key={s.id}>
+                      <span>{itemTypeHandler(s)} - </span>
+                      <span>3000 Wh</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
