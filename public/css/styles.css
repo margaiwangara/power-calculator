@@ -115,6 +115,36 @@ body {
 .appliances .btn {
   border-radius: 0 8px 8px 0;
 }
+
+/* tabs */
+.tabs-container {
+  display: flex;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  list-style-type: none;
+}
+
+.tab {
+  background-color: transparent;
+  padding: 0.75rem;
+  font-size: 0.8rem;
+  border: solid 1px var(--text);
+  cursor: pointer;
+  color: var(--white);
+}
+
+.tab:hover {
+  opacity: 0.75;
+}
+
+.tab.active {
+  border-color: var(--accent);
+  background-color: var(--accent);
+}
+
 /* End of Appliances Section */
 
 /* Appliances/Playground/Info Section */

@@ -4,7 +4,7 @@ import {
   indexPumpAndAirConditioners,
 } from '../utils/data';
 import { APPLIANCE, TOOL, PACS } from '../utils/types';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 const DEFAULT_INFO = {
   power: 0,
@@ -19,6 +19,7 @@ function Home() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [chosenItem, setChosenItem] = useState({});
   const [value, setValue] = useState('');
+  const [active, setActive] = useState(APPLIANCE);
   const [info, setInfo] = useState(DEFAULT_INFO);
   const [calculation, setCalculation] = useState({
     total: 0,
@@ -26,11 +27,11 @@ function Home() {
   });
 
   const populateItems = () =>
-    setItems(
-      [...indexedAppliances.map((appl) => ({ ...appl }))],
-      ...indexedTools.map((tls) => ({ ...tls })),
-      ...indexPumpAndAirConditioners.map((pac) => ({ ...pac })),
-    );
+    setItems([
+      ...indexedAppliances.map((appl) => ({ ...appl, info })),
+      ...indexedTools.map((tls) => ({ ...tls, info })),
+      ...indexPumpAndAirConditioners.map((pac) => ({ ...pac, info })),
+    ]);
 
   useEffect(() => {
     let isMounted = true;
@@ -52,7 +53,19 @@ function Home() {
 
     if (exists) return;
 
-    setSelectedItems([...selectedItems, item]);
+    const modifiedArray = selectedItems?.map((si, index, arr) => {
+      if (index === arr?.length - 1) {
+        return {
+          ...si,
+          info,
+        };
+      }
+
+      return si;
+    });
+
+    setInfo(DEFAULT_INFO);
+    setSelectedItems([...modifiedArray, item]);
     setChosenItem(item);
   };
 
@@ -84,7 +97,21 @@ function Home() {
   };
 
   const populateInfo = (e) => {
-    setInfo({ ...info, [e.target.name]: e.target.value });
+    setInfo({ ...info, [e.target.name]: parseFloat(e.target.value) });
+
+    if (e.target.name === 'current') {
+      setInfo({
+        ...info,
+        current: parseFloat(e.target.value),
+        power: e.target.value * info?.voltage,
+      });
+    } else if (e.target.name === 'voltage') {
+      setInfo({
+        ...info,
+        voltage: parseFloat(e.target.value),
+        power: e.target.value * info?.current,
+      });
+    }
   };
 
   useEffect(() => {
@@ -92,21 +119,13 @@ function Home() {
 
     const { power, hoursPerDay, amount, current, voltage } = info;
 
-    setInfo({ ...info, power: current * voltage });
-
     setCalculation({ ...info, total: power * hoursPerDay * amount });
     // setChosenItem({ ...chosenItem, totalPower: power * hoursPerDay * amount });
 
     return () => {
       isMounted = false;
     };
-  }, [
-    info?.power,
-    info?.hoursPerDay,
-    info?.amount,
-    info?.current,
-    info?.voltage,
-  ]);
+  }, [info?.power, info?.hoursPerDay, info?.amount]);
 
   return (
     <main id="wrapper">
@@ -126,17 +145,48 @@ function Home() {
             Search
           </button>
         </div>
+        <div className="tabs-container">
+          <ul className="tabs">
+            <li>
+              <button
+                className={`tab${active === APPLIANCE ? ' active' : ''}`}
+                onClick={() => setActive(APPLIANCE)}
+              >
+                Appliances
+              </button>
+            </li>
+            <li>
+              <button
+                className={`tab${active === TOOL ? ' active' : ''}`}
+                onClick={() => setActive(TOOL)}
+              >
+                Tools
+              </button>
+            </li>
+            <li>
+              <button
+                className={`tab${active === PACS ? ' active' : ''}`}
+                onClick={() => setActive(PACS)}
+              >
+                Pumps and Air Conditioners
+              </button>
+            </li>
+          </ul>
+        </div>
         <div className="appliances-container">
-          {items.map((item, index) => (
-            <button
-              className="appliance-container"
-              key={item.id}
-              onClick={(e) => populatePlayground(e, item.id)}
-            >
-              <div className="appliance"></div>
-              <h5 className="text-sm">{itemTypeHandler(item)}</h5>
-            </button>
-          ))}
+          {items.map(
+            (item, index) =>
+              item?.type === active && (
+                <button
+                  className="appliance-container"
+                  key={item.id}
+                  onClick={(e) => populatePlayground(e, item.id)}
+                >
+                  <div className="appliance"></div>
+                  <h5 className="text-sm">{itemTypeHandler(item)}</h5>
+                </button>
+              ),
+          )}
         </div>
       </section>
       <section className="box playground">
@@ -145,7 +195,10 @@ function Home() {
           <button
             className="btn btn-primary"
             type="button"
-            onClick={() => setSelectedItems([])}
+            onClick={() => {
+              setSelectedItems([]);
+              setChosenItem({});
+            }}
           >
             Clear
           </button>
@@ -255,16 +308,28 @@ function Home() {
               </div>
               <div className="specs total-specs">
                 <span>Total Power Consumption:</span>
-                <span className="total">{calculation?.total} Wh</span>
+                <span className="total">
+                  {selectedItems?.reduce((acc, curr) => {
+                    const { info } = curr;
+                    acc += info?.power * info?.hoursPerDay * info?.amount;
+                    return acc;
+                  }, 0)}{' '}
+                  Wh
+                </span>
               </div>
               <div className="specs">
                 <ul className="list-of-items">
-                  {selectedItems?.map((s) => (
-                    <li key={s.id}>
-                      <span>{itemTypeHandler(s)} - </span>
-                      <span>3000 Wh</span>
-                    </li>
-                  ))}
+                  {selectedItems?.map((s) => {
+                    const { info } = s;
+                    return (
+                      <li key={s.id}>
+                        <span>{itemTypeHandler(s)} - </span>
+                        <span>
+                          {info?.power * info?.hoursPerDay * info?.amount} Wh
+                        </span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>
