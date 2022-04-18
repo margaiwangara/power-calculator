@@ -5,13 +5,14 @@ import {
 } from '../utils/data';
 import { APPLIANCE, TOOL, PACS } from '../utils/types';
 import { useState, useEffect } from 'react';
+import styles from '../css/Home.module.css';
 
 const DEFAULT_INFO = {
   power: 0,
   current: 0,
   voltage: 0,
   amount: 1,
-  hoursPerDay: 1,
+  hoursPerDay: 0.5,
   daysOffGrid: 1,
 };
 function Home() {
@@ -145,33 +146,17 @@ function Home() {
             Search
           </button>
         </div>
-        <div className="tabs-container">
-          <ul className="tabs">
-            <li>
-              <button
-                className={`tab${active === APPLIANCE ? ' active' : ''}`}
-                onClick={() => setActive(APPLIANCE)}
-              >
-                Appliances
-              </button>
-            </li>
-            <li>
-              <button
-                className={`tab${active === TOOL ? ' active' : ''}`}
-                onClick={() => setActive(TOOL)}
-              >
-                Tools
-              </button>
-            </li>
-            <li>
-              <button
-                className={`tab${active === PACS ? ' active' : ''}`}
-                onClick={() => setActive(PACS)}
-              >
-                Pumps and Air Conditioners
-              </button>
-            </li>
-          </ul>
+        <div className={styles.selectContainer}>
+          <label htmlFor="category">Select a category:</label>
+          <select
+            name="category"
+            id="category"
+            onChange={(e) => setActive(e.target.value)}
+          >
+            <option value={APPLIANCE}>Appliances</option>
+            <option value={TOOL}>Tools</option>
+            <option value={PACS}>Pumps and Air Conditioners</option>
+          </select>
         </div>
         <div className="appliances-container">
           {items.map(
@@ -232,53 +217,19 @@ function Home() {
             <div className="specs-box">
               <h6 className="title">Specification</h6>
               <div className="specs">
-                <span>Power:</span>
-                <input
-                  type="number"
-                  className="specs-value"
-                  value={info.power}
-                  onChange={populateInfo}
-                  name="power"
-                />
-                {/* <span className="specs-value"> 1515 </span> */}
+                <span>Watts:</span>
+                <span className="specs-value"> 1515 </span>
                 <span>W</span>
               </div>
               <div className="specs">
-                <span>Current:</span>
-                <input
-                  type="number"
-                  className="specs-value"
-                  value={info.current}
-                  onChange={populateInfo}
-                  name="current"
-                />
-                {/* <span className="specs-value"> 13.75 </span> */}
+                <span>Amps:</span>
+                <span className="specs-value"> 13.75 </span>
                 <span>A</span>
               </div>
               <div className="specs">
-                <span>Voltage:</span>
-                <input
-                  type="number"
-                  className="specs-value"
-                  value={info.voltage}
-                  onChange={populateInfo}
-                  name="voltage"
-                />
-                {/* <span className="specs-value"> 110 </span> */}
+                <span>Volts:</span>
+                <span className="specs-value"> 110 </span>
                 <span>V</span>
-              </div>
-            </div>
-            <div className="specs-box">
-              <div className="specs">
-                <span>Amount:</span>
-                <input
-                  type="number"
-                  className="specs-value"
-                  value={info.amount}
-                  onChange={populateInfo}
-                  name="amount"
-                />
-                {/* <span className="specs-value">4</span> */}
               </div>
             </div>
             <div className="specs-box">
@@ -290,22 +241,12 @@ function Home() {
                   value={info.hoursPerDay}
                   onChange={populateInfo}
                   name="hoursPerDay"
+                  step={0.1}
+                  min={0}
                 />
-                {/* <span className="specs-value">1</span> */}
               </div>
             </div>
             <div className="specs-box">
-              <div className="specs">
-                <span>Days Of Off-Grid:</span>
-                <input
-                  type="number"
-                  className="specs-value"
-                  value={info.daysOffGrid}
-                  onChange={populateInfo}
-                  name="daysOffGrid"
-                />
-                {/* <span className="specs-value">1</span> */}
-              </div>
               <div className="specs total-specs">
                 <span>Total Power Consumption:</span>
                 <span className="total">
