@@ -45,9 +45,11 @@
   border-bottom-left-radius: 0;
 }
 
+.playground .playground-title,
 .appliances .appliance-title,
-.playground .playground-title {
+.info .appliance-title {
   border-left: solid var(--bul-primary) 3px;
+  border-radius: 0;
 }
 
 .appliance-items-box {
@@ -108,3 +110,39 @@
 .del:hover {
   opacity: 0.75;
 }
+
+.item-section {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+/* Info Section */
+.info,
+.specs-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.info {
+  gap: 1rem;
+}
+
+.specs-box {
+  border-radius: 8px;
+}
+
+.info-image {
+  height: 80px;
+  width: 80px;
+  border-radius: 8px;
+  border: solid 1px var(--text);
+  align-self: center;
+}
+
+.info h4,
+.info h5 {
+  border-radius: 8px;
+}
+/* End of Info Section */
