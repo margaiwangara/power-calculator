@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import HeadBoy from '../components/HeadBoy';
 import prisma from '../lib/prisma';
 import Wrapper from '../components/Wrapper';
@@ -21,6 +21,16 @@ function Home({ appliances, categories }) {
   const deleteItem = (id) => {
     setSelectedItems(selectedItems.filter((item) => item.id !== id));
   };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    setActiveItem(selectedItems?.[selectedItems?.length - 1] || {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedItems]);
 
   return (
     <main className="has-background-light" id="wrapper">
@@ -47,6 +57,7 @@ function Home({ appliances, categories }) {
                     <select
                       name="category"
                       id="category"
+                      className="is-capitalized"
                       onChange={(e) => setActiveTab(e.target.value)}
                     >
                       {categories?.map((c) => (
@@ -82,7 +93,12 @@ function Home({ appliances, categories }) {
                 </h4>
               </div>
               <div className="column is-one-quarter has-text-right">
-                <button className="button is-primary">Clear</button>
+                <button
+                  className="button is-primary"
+                  onClick={() => setSelectedItems([])}
+                >
+                  Clear
+                </button>
               </div>
             </div>
             <section className="playground-box is-flex">
@@ -103,89 +119,95 @@ function Home({ appliances, categories }) {
               ))}
             </section>
           </section>
-          <Wrapper title="Info" className="info">
-            <div className="info-image" />
-            <h4 className="info-title p-2 has-background-black has-text-centered has-text-white">
-              Air Purifier
-            </h4>
-            <div className="specs-box has-background-light p-3">
-              <h6 className="is-size-7 is-capitalized has-text-weight-semibold mb-3">
-                Specification
-              </h6>
-              <div className="columns is-vcentered">
-                <div className="column is-one-half">
-                  <p className="is-size-7 has-text-weight-normal">Watts:</p>
+          {Object.keys(activeItem).length > 0 && (
+            <Wrapper title="Info" className="info">
+              <div className="info-image" />
+              <h4 className="info-title p-2 has-background-black has-text-centered has-text-white">
+                {activeItem?.name}
+              </h4>
+              <div className="specs-box has-background-light p-3">
+                <h6 className="is-size-7 is-capitalized has-text-weight-semibold mb-3">
+                  Specification
+                </h6>
+                <div className="columns is-vcentered">
+                  <div className="column is-one-half">
+                    <p className="is-size-7 has-text-weight-normal">Watts:</p>
+                  </div>
+                  <div className="column is-one-half">
+                    <h5 className="is-size-7 has-text-white p-2 has-text-centered has-background-black has-text-weight-semibold">
+                      {activeItem?.watts}
+                    </h5>
+                  </div>
                 </div>
-                <div className="column is-one-half">
-                  <h5 className="is-size-7 has-text-white p-2 has-text-centered has-background-black has-text-weight-semibold">
-                    12.25
-                  </h5>
+                <div className="columns is-vcentered">
+                  <div className="column is-one-half">
+                    <p className="is-size-7 has-text-weight-normal">Amps:</p>
+                  </div>
+                  <div className="column is-one-half">
+                    <h5 className="is-size-7 has-text-white p-2 has-text-centered has-background-black has-text-weight-semibold">
+                      {activeItem?.amps}
+                    </h5>
+                  </div>
                 </div>
-              </div>
-              <div className="columns is-vcentered">
-                <div className="column is-one-half">
-                  <p className="is-size-7 has-text-weight-normal">Amps:</p>
-                </div>
-                <div className="column is-one-half">
-                  <h5 className="is-size-7 has-text-white p-2 has-text-centered has-background-black has-text-weight-semibold">
-                    12.25
-                  </h5>
-                </div>
-              </div>
-              <div className="columns is-vcentered">
-                <div className="column is-one-half">
-                  <p className="is-size-7 has-text-weight-normal">Volts:</p>
-                </div>
-                <div className="column is-one-half">
-                  <h5 className="is-size-7 has-text-white p-2 has-text-centered has-background-black has-text-weight-semibold">
-                    12.25
-                  </h5>
-                </div>
-              </div>
-            </div>
-            <div className="specs-box has-background-light p-3">
-              <div className="columns is-vcentered">
-                <div className="column is-one-half">
-                  <p className="is-size-7 has-text-weight-normal">
-                    Hours Per Day:
-                  </p>
-                </div>
-                <div className="column is-one-half">
-                  <h5 className="is-size-7 has-text-white p-2 has-text-centered has-background-black has-text-weight-semibold">
-                    1
-                  </h5>
-                </div>
-              </div>
-            </div>
-            <div className="specs-box has-background-light p-3">
-              <div className="columns is-vcentered">
-                <div className="column is-two-thirds">
-                  <p className="is-size-7 has-text-weight-normal">
-                    Total Power Consumption
-                  </p>
-                </div>
-                <div className="column is-one-third">
-                  <p className="is-size-5 has-text-weight-medium has-text-primary has-text-right">
-                    0 Wh
-                  </p>
-                </div>
-              </div>
-              <div className="columns">
-                <div className="column">
-                  <div className="table-container">
-                    <table className="table is-bordered is-narrow is-fullwidth has-background-light">
-                      <tbody>
-                        <tr>
-                          <td className="is-size-7">Air Conditioner</td>
-                          <td className="is-size-7">0 Wh</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                <div className="columns is-vcentered">
+                  <div className="column is-one-half">
+                    <p className="is-size-7 has-text-weight-normal">Volts:</p>
+                  </div>
+                  <div className="column is-one-half">
+                    <h5 className="is-size-7 has-text-white p-2 has-text-centered has-background-black has-text-weight-semibold">
+                      {activeItem?.amps * activeItem?.watts}
+                    </h5>
                   </div>
                 </div>
               </div>
-            </div>
-          </Wrapper>
+              <div className="specs-box has-background-light p-3">
+                <div className="columns is-vcentered">
+                  <div className="column is-one-half">
+                    <p className="is-size-7 has-text-weight-normal">
+                      Hours Per Day:
+                    </p>
+                  </div>
+                  <div className="column is-one-half">
+                    <h5 className="is-size-7 has-text-white p-2 has-text-centered has-background-black has-text-weight-semibold">
+                      1
+                    </h5>
+                  </div>
+                </div>
+              </div>
+              <div className="specs-box has-background-light p-3">
+                <div className="is-flex is-align-items-center is-flex-wrap mb-2">
+                  <p className="is-size-7 has-text-weight-normal mr-1">
+                    Total Power Consumption
+                  </p>
+                  <p className="is-size-6 has-text-weight-medium has-text-primary has-text-right is-flex-grow-1">
+                    {selectedItems?.reduce(
+                      (acc, curr) => acc + curr?.watts * curr?.amps,
+                      0,
+                    )}{' '}
+                    Wh
+                  </p>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="table-container">
+                      <table className="table is-bordered is-narrow is-fullwidth has-background-light">
+                        <tbody>
+                          {selectedItems?.map((si) => (
+                            <tr key={si?.id}>
+                              <td className="is-size-7">{si?.name}</td>
+                              <td className="is-size-7">
+                                {si?.watts * si?.amps} Wh
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Wrapper>
+          )}
         </section>
       </section>
     </main>

@@ -7,3 +7,7 @@
   --text: #a6adb4;
   --danger: #d10404;
 }
+
+select option {
+  text-transform: capitalize;
+}

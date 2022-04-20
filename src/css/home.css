@@ -45,6 +45,16 @@
   border-bottom-left-radius: 0;
 }
 
+.appliances,
+.playground,
+.info {
+  border-radius: 8px;
+}
+
+.appliances {
+  width: 300px;
+}
+
 .playground .playground-title,
 .appliances .appliance-title,
 .info .appliance-title {
