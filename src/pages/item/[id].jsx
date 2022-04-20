@@ -1,10 +1,12 @@
 import Form from '../../components/Form';
 import prisma from '../../lib/prisma';
 import Link from 'next/link';
+import HeadBoy from '../../components/HeadBoy';
 
-function Create({ item, categories }) {
+function Edit({ item, categories }) {
   return (
     <main>
+      <HeadBoy title="Edit" />
       <section className="container">
         <section className="columns mt-5 px-3">
           <section className="column is-offset-one-third is-one-third">
@@ -46,4 +48,4 @@ export async function getServerSideProps({ params }) {
     },
   };
 }
-export default Create;
+export default Edit;

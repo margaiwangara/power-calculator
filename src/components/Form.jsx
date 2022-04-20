@@ -8,6 +8,7 @@ function Form({ categories, item }) {
     watts: item?.watts || 0.0,
     amps: item?.amps || 0.0,
     category: item?.category || categories?.[0],
+    hoursPerDay: item?.hpd || 1,
   });
   const [error, setError] = useState('');
   const router = useRouter();
@@ -57,7 +58,7 @@ function Form({ categories, item }) {
         type="number"
         placeholder="Amps"
         label="Amps"
-        value={values?.amps || ''}
+        value={values?.amps || 0.0}
         onChange={onChange}
         required={true}
         name="amps"
@@ -66,10 +67,18 @@ function Form({ categories, item }) {
         type="number"
         placeholder="Watts"
         label="Watts"
-        value={values?.watts || ''}
+        value={values?.watts || 0.0}
         onChange={onChange}
         required={true}
         name="watts"
+      />
+      <Field
+        type="number"
+        placeholder="Hours Per Day"
+        label="Hours Per Day"
+        value={values?.hoursPerDay || 0.0}
+        onChange={onChange}
+        name="hoursPerDay"
       />
       <div className="field">
         <label className="label" id="category">

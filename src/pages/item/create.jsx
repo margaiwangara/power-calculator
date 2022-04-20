@@ -1,10 +1,12 @@
 import Form from '../../components/Form';
 import prisma from '../../lib/prisma';
 import Link from 'next/link';
+import HeadBoy from '../../components/HeadBoy';
 
 function Create({ categories }) {
   return (
     <main>
+      <HeadBoy title="Create" />
       <section className="container">
         <section className="columns mt-5 px-3">
           <section className="column is-offset-one-third is-one-third">
