@@ -15,7 +15,7 @@ model Appliance {
   name        String
   amps        Float @default(0.0)
   watts       Float @default(0.0)
-  hpd         Float @default(0.0)
+  hpd         Float @default(1.0)
   category    Category @default(APPLIANCES)
   createdAt   DateTime  @default(now()) @map(name: "created_at")
   updatedAt   DateTime  @updatedAt @map(name: "updated_at")

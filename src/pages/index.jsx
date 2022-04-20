@@ -7,6 +7,7 @@ function Home({ appliances, categories }) {
   const [activeTab, setActiveTab] = useState(categories?.[0]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [activeItem, setActiveItem] = useState({});
+  const [hoursPerDay, setHoursPerDay] = useState(1.0);
 
   const populateSelected = (item) => {
     const findSelected = selectedItems.find((i) => i.id === item.id);
@@ -31,6 +32,26 @@ function Home({ appliances, categories }) {
       isMounted = false;
     };
   }, [selectedItems]);
+
+  useEffect(() => {
+    setHoursPerDay(activeItem?.hpd || 1.0);
+  }, [activeItem]);
+
+  const modifyHoursPerDay = (e) => {
+    setHoursPerDay(parseFloat(e.target.value));
+    setSelectedItems(
+      selectedItems?.map((si) => {
+        if (si?.id === activeItem?.id) {
+          return {
+            ...si,
+            hpd: parseFloat(e.target.value),
+          };
+        }
+
+        return si;
+      }) || [],
+    );
+  };
 
   return (
     <main className="has-background-light" id="wrapper">
@@ -168,9 +189,20 @@ function Home({ appliances, categories }) {
                     </p>
                   </div>
                   <div className="column is-one-half">
-                    <h5 className="is-size-7 has-text-white p-2 has-text-centered has-background-black has-text-weight-semibold">
-                      1
-                    </h5>
+                    <input
+                      type="number"
+                      className="is-size-7 has-text-white p-2 has-text-centered has-background-black has-text-weight-semibold is-fullwidth"
+                      name="hpd"
+                      value={hoursPerDay}
+                      onChange={modifyHoursPerDay}
+                      step={0.1}
+                      min={0}
+                      style={{
+                        width: '100%',
+                        borderRadius: '8px',
+                        border: 'none',
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -180,10 +212,13 @@ function Home({ appliances, categories }) {
                     Total Power Consumption
                   </p>
                   <p className="is-size-6 has-text-weight-medium has-text-primary has-text-right is-flex-grow-1">
-                    {selectedItems?.reduce(
-                      (acc, curr) => acc + curr?.watts * curr?.amps,
-                      0,
-                    )}{' '}
+                    {selectedItems
+                      ?.reduce(
+                        (acc, curr) =>
+                          acc + curr?.watts * curr?.amps * curr?.hpd,
+                        0,
+                      )
+                      .toFixed(1)}{' '}
                     Wh
                   </p>
                 </div>
@@ -196,7 +231,7 @@ function Home({ appliances, categories }) {
                             <tr key={si?.id}>
                               <td className="is-size-7">{si?.name}</td>
                               <td className="is-size-7">
-                                {si?.watts * si?.amps} Wh
+                                {(si?.watts * si?.amps * si?.hpd).toFixed(1)} Wh
                               </td>
                             </tr>
                           ))}
