@@ -54,6 +54,7 @@ function Dashboard({ appliances }) {
                 <th>Watts</th>
                 <th>Amps</th>
                 <th>Volts</th>
+                <th>Hours Per Day</th>
                 <th>Category</th>
                 <th />
               </tr>
@@ -66,6 +67,7 @@ function Dashboard({ appliances }) {
                   <td>{appliance?.watts}</td>
                   <td>{appliance?.amps}</td>
                   <td>{appliance?.volts}</td>
+                  <td>{appliance?.hpd}</td>
                   <td className="is-capitalized">
                     {appliance?.category?.split('_').join(' ')}
                   </td>
