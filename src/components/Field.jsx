@@ -20,7 +20,7 @@ function Field({
           className="input"
           placeholder={placeholder}
           onChange={onChange}
-          value={value}
+          defaultValue={value}
           required={required}
           min={0}
           step={0.1}

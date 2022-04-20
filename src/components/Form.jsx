@@ -29,6 +29,8 @@ function Form({ categories, item }) {
           ...values,
           amps: parseFloat(values.amps),
           watts: parseFloat(values.watts),
+          hpd: parseFloat(values.hoursPerDay),
+          hoursPerDay: undefined,
         }),
       });
       const data = await response.json();
@@ -45,6 +47,7 @@ function Form({ categories, item }) {
   };
   return (
     <form method="POST" onSubmit={onSubmit}>
+      {error && <div className="notification is-danger">{error}</div>}
       <Field
         type="text"
         placeholder="Title"
