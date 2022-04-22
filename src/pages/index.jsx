@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import HeadBoy from '../components/HeadBoy';
 import prisma from '../lib/prisma';
 import Wrapper from '../components/Wrapper';
+import { shapeResponse } from '../utils/calculatePower';
 
 function Home({ appliances, categories }) {
-  const [activeTab, setActiveTab] = useState(categories?.[0]);
+  const [activeTab, setActiveTab] = useState(categories?.[0]?.id);
   const [selectedItems, setSelectedItems] = useState([]);
   const [activeItem, setActiveItem] = useState({});
   const [hoursPerDay, setHoursPerDay] = useState(1.0);
+  const [items, setItems] = useState([]);
+  const [searchWord, setSearchWord] = useState('');
 
   const populateSelected = (item) => {
     const findSelected = selectedItems.find((i) => i.id === item.id);
@@ -37,6 +40,18 @@ function Home({ appliances, categories }) {
     setHoursPerDay(activeItem?.hpd || 1.0);
   }, [activeItem]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    if (isMounted) {
+      setItems(appliances);
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const modifyHoursPerDay = (e) => {
     setHoursPerDay(parseFloat(e.target.value));
     setSelectedItems(
@@ -53,17 +68,47 @@ function Home({ appliances, categories }) {
     );
   };
 
+  const searchItem = (keyword) => {
+    if (!keyword) {
+      setSearchWord('');
+      setItems(appliances?.filter((a) => a.categoryId === activeTab));
+      return;
+    }
+
+    setItems(
+      items.filter(
+        (i) => i?.name?.toLowerCase().indexOf(keyword.toLowerCase()) > -1,
+      ),
+    );
+  };
+
+  console.log('items', items);
+
   return (
     <main className="has-background-light" id="wrapper">
       <HeadBoy title="Home" />
       <section className="container py-5">
         <section className="item-section">
           <Wrapper title="Appliances" className="appliances">
-            <form className="my-2">
+            <form
+              className="my-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                searchItem(searchWord);
+              }}
+            >
               <div className="field">
                 <div className="control is-flex">
-                  <input type="text" className="input" />
-                  <button className="button is-primary">Search</button>
+                  {/* <input
+                    type="text"
+                    className="input"
+                    value={searchWord}
+                    onChange={(e) => {
+                      setSearchWord(e.target.value);
+                      searchItem(e.target.value);
+                    }}
+                  />
+                  <button className="button is-primary">Search</button> */}
                 </div>
               </div>
             </form>
@@ -79,19 +124,22 @@ function Home({ appliances, categories }) {
                       name="category"
                       id="category"
                       className="is-capitalized"
-                      onChange={(e) => setActiveTab(e.target.value)}
+                      defaultValue={activeTab}
+                      onChange={(e) => setActiveTab(parseInt(e.target.value))}
                     >
                       {categories?.map((c) => (
-                        <option value={c}>{c?.split('_').join(' ')}</option>
+                        <option value={c?.id} key={c?.id}>
+                          {c?.name}
+                        </option>
                       ))}
                     </select>
                   </div>
                 </div>
               </div>
               <section className="appliance-items-box">
-                {appliances?.map(
+                {items?.map(
                   (a) =>
-                    a?.category === activeTab && (
+                    a?.categoryId === activeTab && (
                       <button
                         className="item is-flex is-flex-direction-column"
                         key={a?.id}
@@ -176,7 +224,7 @@ function Home({ appliances, categories }) {
                   </div>
                   <div className="column is-one-half">
                     <h5 className="is-size-7 has-text-white p-2 has-text-centered has-background-black has-text-weight-semibold">
-                      {activeItem?.amps * activeItem?.watts}
+                      {activeItem?.volts}
                     </h5>
                   </div>
                 </div>
@@ -213,11 +261,7 @@ function Home({ appliances, categories }) {
                   </p>
                   <p className="is-size-6 has-text-weight-medium has-text-primary has-text-right is-flex-grow-1">
                     {selectedItems
-                      ?.reduce(
-                        (acc, curr) =>
-                          acc + curr?.watts * curr?.amps * curr?.hpd,
-                        0,
-                      )
+                      ?.reduce((acc, curr) => acc + curr?.volts * curr?.hpd, 0)
                       .toFixed(1)}{' '}
                     Wh
                   </p>
@@ -231,7 +275,7 @@ function Home({ appliances, categories }) {
                             <tr key={si?.id}>
                               <td className="is-size-7">{si?.name}</td>
                               <td className="is-size-7">
-                                {(si?.watts * si?.amps * si?.hpd).toFixed(1)} Wh
+                                {(si?.volts * si?.hpd).toFixed(1)} Wh
                               </td>
                             </tr>
                           ))}
@@ -250,20 +294,15 @@ function Home({ appliances, categories }) {
 }
 
 export async function getServerSideProps() {
-  const result = await prisma.appliance.findMany();
+  const applianceResults = await prisma.appliance.findMany();
+  const categoryResults = await prisma.category.findMany();
 
-  const appliances = result.map((appliance) => ({
-    ...appliance,
-    createdAt: new Date(appliance?.created_at).toLocaleDateString(),
-    updatedAt: new Date(appliance?.updated_at).toLocaleDateString(),
-    volts: appliance?.amps * appliance?.watts,
-  }));
+  const appliances = applianceResults.map((appliance) =>
+    shapeResponse(appliance),
+  );
+  const categories = categoryResults.map((category) => shapeResponse(category));
 
-  const categoryResults = await prisma.appliance.groupBy({
-    by: ['category'],
-  });
-
-  const categories = categoryResults.map((result) => result?.category);
+  console.log('appliances', applianceResults);
 
   return {
     props: {

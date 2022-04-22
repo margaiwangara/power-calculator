@@ -14,8 +14,6 @@ function Dashboard({ appliances, categories }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  console.log('appliances', appliances);
-
   const deleteItem = async (id, name, isItem) => {
     setLoading(true);
     const shouldDelete = window.confirm(

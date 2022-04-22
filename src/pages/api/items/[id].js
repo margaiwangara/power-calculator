@@ -11,6 +11,8 @@ export default async function handle(req, res) {
       },
       data: {
         ...req.body,
+        categoryId: req.body.category,
+        category: undefined,
       },
     });
 
