@@ -5,12 +5,14 @@ import { useRouter } from 'next/router';
 function Form({ categories, item }) {
   const [values, setValues] = useState({
     name: item?.name || '',
-    watts: item?.watts || 0.0,
+    volts: item?.volts || 0.0,
     amps: item?.amps || 0.0,
-    category: item?.category || categories?.[0],
+    category: item?.categoryId || categories?.[0]?.id,
     hoursPerDay: item?.hpd || 1,
+    runsPerHour: item?.rph || 0,
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const onChange = (e) =>
@@ -18,6 +20,7 @@ function Form({ categories, item }) {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const response = await fetch(`/api/items${item ? '/' + item.id : ''}`, {
@@ -28,21 +31,28 @@ function Form({ categories, item }) {
         body: JSON.stringify({
           ...values,
           amps: parseFloat(values.amps),
-          watts: parseFloat(values.watts),
+          volts: parseFloat(values.volts),
+          watts: parseFloat(values.amps) * parseFloat(values.volts),
           hpd: parseFloat(values.hoursPerDay),
+          rph: parseFloat(values.runsPerHour),
+          categoryId: parseInt(values.category),
+          category: undefined,
+          runsPerHour: undefined,
           hoursPerDay: undefined,
         }),
       });
       const data = await response.json();
       if (data?.error) {
         setError(data?.error);
+        setLoading(false);
         return;
       }
 
+      setLoading(false);
       router.push('/dashboard');
     } catch (error) {
-      alert(JSON.stringify(error));
-      setError(error?.message);
+      setLoading(false);
+      setError(error?.message || 'An error was encountered');
     }
   };
   return (
@@ -68,12 +78,12 @@ function Form({ categories, item }) {
       />
       <Field
         type="number"
-        placeholder="Watts"
-        label="Watts"
-        value={values?.watts || 0.0}
+        placeholder="Volts"
+        label="Volts"
+        value={values?.volts || 0.0}
         onChange={onChange}
         required={true}
-        name="watts"
+        name="volts"
       />
       <Field
         type="number"
@@ -83,6 +93,7 @@ function Form({ categories, item }) {
         onChange={onChange}
         name="hoursPerDay"
       />
+
       <div className="field">
         <label className="label" id="category">
           Category
@@ -97,15 +108,28 @@ function Form({ categories, item }) {
               defaultValue={values?.category}
             >
               {categories?.map((category) => (
-                <option value={category} key={category}>
-                  {category?.split('_').join(' ')}
+                <option value={category?.id} key={category?.id}>
+                  {category?.name}
                 </option>
               ))}
             </select>
           </div>
         </div>
       </div>
-      <button className="button is-primary is-fullwidth" type="submit">
+      <Field
+        type="number"
+        placeholder="Runs Per Hour in Seconds"
+        label="Runs Per Hour in Seconds"
+        value={values?.runsPerHour || 0}
+        onChange={onChange}
+        name="runsPerHour"
+      />
+      <button
+        className={`button is-primary is-fullwidth${
+          loading ? ' is-loading' : ''
+        }`}
+        type="submit"
+      >
         Submit
       </button>
     </form>

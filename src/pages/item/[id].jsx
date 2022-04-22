@@ -2,6 +2,7 @@ import Form from '../../components/Form';
 import prisma from '../../lib/prisma';
 import Link from 'next/link';
 import HeadBoy from '../../components/HeadBoy';
+import { shapeResponse } from '../../utils/calculatePower';
 
 function Edit({ item, categories }) {
   return (
@@ -24,27 +25,20 @@ function Edit({ item, categories }) {
 
 export async function getServerSideProps({ params }) {
   // grouped categories
-  const results = await prisma.appliance.groupBy({
-    by: ['category'],
-  });
-  const item = await prisma.appliance.findUnique({
+  const categoryResults = await prisma.category.findMany();
+  const itemResults = await prisma.appliance.findUnique({
     where: {
       id: parseInt(params?.id),
     },
   });
 
-  const categories = results.map((result) => result?.category);
-
-  const updatedItem = {
-    ...item,
-    createdAt: new Date(item?.created_at).toLocaleDateString(),
-    updatedAt: new Date(item?.updated_at).toLocaleDateString(),
-  };
+  const categories = categoryResults.map((category) => shapeResponse(category));
+  const item = shapeResponse(itemResults);
 
   return {
     props: {
       categories,
-      item: updatedItem,
+      item,
     },
   };
 }

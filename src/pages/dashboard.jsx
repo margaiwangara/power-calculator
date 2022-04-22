@@ -14,6 +14,8 @@ function Dashboard({ appliances, categories }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  console.log('appliances', appliances);
+
   const deleteItem = async (id, name, isItem) => {
     setLoading(true);
     const shouldDelete = window.confirm(
@@ -121,7 +123,7 @@ function Dashboard({ appliances, categories }) {
                     <td>{appliance?.volts}</td>
                     <td>{appliance?.hpd}</td>
                     <td className="is-capitalized">
-                      {appliance?.category?.split('_').join(' ')}
+                      {appliance?.category?.name}
                     </td>
                     <td>
                       <Link href={`/item/${appliance.id}`}>
@@ -182,11 +184,20 @@ function Dashboard({ appliances, categories }) {
 }
 
 export async function getServerSideProps() {
-  const applianceResults = await prisma.appliance.findMany();
+  const applianceResults = await prisma.appliance.findMany({
+    include: {
+      category: true,
+    },
+  });
   const categoryResults = await prisma.category.findMany();
 
   const appliances = applianceResults.map((appliance) =>
-    shapeResponse(appliance),
+    shapeResponse({
+      ...appliance,
+      category: {
+        ...shapeResponse(appliance.category),
+      },
+    }),
   );
   const categories = categoryResults.map((category) => shapeResponse(category));
 

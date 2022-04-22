@@ -1,7 +1,8 @@
-import Form from '../../components/Form';
 import prisma from '../../lib/prisma';
 import Link from 'next/link';
 import HeadBoy from '../../components/HeadBoy';
+import Form from '../../components/Form';
+import { shapeResponse } from '../../utils/calculatePower';
 
 function Create({ categories }) {
   return (
@@ -14,7 +15,7 @@ function Create({ categories }) {
               <a className="is-link">Back to Dashboard</a>
             </Link>
             <div className="mb-3" />
-            <Form categories={categories} item={null} />
+            <Form categories={categories} />
           </section>
         </section>
       </section>
@@ -22,13 +23,10 @@ function Create({ categories }) {
   );
 }
 
-export async function getStaticProps() {
-  // grouped categories
-  const results = await prisma.appliance.groupBy({
-    by: ['category'],
-  });
+export async function getServerSideProps() {
+  const results = await prisma.category.findMany();
 
-  const categories = results.map((result) => result?.category);
+  const categories = results.map((category) => shapeResponse(category));
 
   return {
     props: {
