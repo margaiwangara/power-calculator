@@ -6,7 +6,10 @@ import { useRouter } from 'next/router';
 import { shapeResponse } from '../../utils/calculatePower';
 
 function Edit({ category }) {
-  const [name, setName] = useState(category?.name || '');
+  const [values, setValues] = useState({
+    name: category.name || '',
+    icon: category.icon || '',
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -22,7 +25,7 @@ function Edit({ category }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name,
+          ...values,
         }),
       });
 
@@ -33,6 +36,9 @@ function Edit({ category }) {
       setLoading(false);
     }
   };
+
+  const onChange = (e) =>
+    setValues({ ...values, [e.target.name]: e.target.value });
 
   return (
     <main>
@@ -50,9 +56,16 @@ function Edit({ category }) {
                 type="text"
                 name="name"
                 placeholder="Category Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={values.name}
+                onChange={onChange}
                 required={true}
+              />
+              <Field
+                type="text"
+                name="icon"
+                placeholder="Category Icon"
+                value={values.icon}
+                onChange={onChange}
               />
               <button
                 className={`button is-primary is-fullwidth${

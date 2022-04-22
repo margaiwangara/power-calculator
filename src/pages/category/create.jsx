@@ -6,9 +6,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 function Create() {
-  const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [values, setValues] = useState({
+    name: '',
+    icon: '',
+  });
   const router = useRouter();
 
   const onSubmit = async (e) => {
@@ -20,7 +23,7 @@ function Create() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ ...values }),
       });
       const data = await response.json();
       if (data?.error) {
@@ -33,6 +36,9 @@ function Create() {
       setLoading(false);
     }
   };
+
+  const onChange = (e) =>
+    setValues({ ...values, [e.target.name]: e.target.value });
 
   return (
     <main>
@@ -49,10 +55,17 @@ function Create() {
               <Field
                 type="text"
                 placeholder="Category Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={values.name}
+                onChange={onChange}
                 required={true}
                 name="name"
+              />
+              <Field
+                type="text"
+                placeholder="Category Icon"
+                value={values.icon}
+                onChange={onChange}
+                name="icon"
               />
               <button
                 className={`button is-primary is-fullwidth${

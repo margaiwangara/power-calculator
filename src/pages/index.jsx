@@ -145,7 +145,19 @@ function Home({ appliances, categories }) {
                         key={a?.id}
                         onClick={() => populateSelected(a)}
                       >
-                        <div className="image" />
+                        <div className="image">
+                          {a?.category?.icon && (
+                            <img
+                              src={a?.category?.icon}
+                              alt="icon"
+                              style={{
+                                height: 50,
+                                width: 50,
+                                objectFit: 'cover',
+                              }}
+                            />
+                          )}
+                        </div>
                         <h6 className="is-size-7 is-capitalized">{a?.name}</h6>
                       </button>
                     ),
@@ -182,7 +194,19 @@ function Home({ appliances, categories }) {
                   >
                     x
                   </button>
-                  <div className="image" />
+                  <div className="image">
+                    {i?.category?.icon && (
+                      <img
+                        src={i?.category?.icon}
+                        alt="icon"
+                        style={{
+                          height: 50,
+                          width: 50,
+                          objectFit: 'cover',
+                        }}
+                      />
+                    )}
+                  </div>
                   <h6 className="is-size-7 is-capitalized">{i?.name}</h6>
                 </div>
               ))}
@@ -190,7 +214,19 @@ function Home({ appliances, categories }) {
           </section>
           {Object.keys(activeItem).length > 0 && (
             <Wrapper title="Info" className="info">
-              <div className="info-image" />
+              <div className="info-image">
+                {activeItem?.category?.icon && (
+                  <img
+                    src={activeItem?.category?.icon}
+                    alt="icon"
+                    style={{
+                      height: 50,
+                      width: 50,
+                      objectFit: 'cover',
+                    }}
+                  />
+                )}
+              </div>
               <h4 className="info-title p-2 has-background-black has-text-centered has-text-white">
                 {activeItem?.name}
               </h4>
@@ -294,11 +330,20 @@ function Home({ appliances, categories }) {
 }
 
 export async function getServerSideProps() {
-  const applianceResults = await prisma.appliance.findMany();
+  const applianceResults = await prisma.appliance.findMany({
+    include: {
+      category: true,
+    },
+  });
   const categoryResults = await prisma.category.findMany();
 
   const appliances = applianceResults.map((appliance) =>
-    shapeResponse(appliance),
+    shapeResponse({
+      ...appliance,
+      category: {
+        ...shapeResponse(appliance.category),
+      },
+    }),
   );
   const categories = categoryResults.map((category) => shapeResponse(category));
 

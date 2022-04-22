@@ -84,6 +84,9 @@
   width: 80px;
   border-radius: 8px;
   border: solid 1px var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .image:hover {
@@ -149,6 +152,9 @@
   border-radius: 8px;
   border: solid 1px var(--text);
   align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .info h4,

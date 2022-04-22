@@ -151,6 +151,7 @@ function Dashboard({ appliances, categories }) {
                     <abbr title="Category ID">#</abbr>
                   </th>
                   <th>Name</th>
+                  <th>Icon</th>
                   <th />
                 </tr>
               </thead>
@@ -159,6 +160,19 @@ function Dashboard({ appliances, categories }) {
                   <tr key={c?.id}>
                     <td>{c?.id}</td>
                     <td>{c?.name}</td>
+                    <td>
+                      {c?.icon && (
+                        <div
+                          style={{ height: 50, width: 50, overflow: 'hidden' }}
+                        >
+                          <img
+                            src={c?.icon}
+                            alt="icon"
+                            style={{ width: '100%', height: '100%' }}
+                          />
+                        </div>
+                      )}
+                    </td>
                     <td>
                       <Link href={`/category/${c?.id}`}>
                         <a className="button is-small is-primary mr-2">Edit</a>

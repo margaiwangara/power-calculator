@@ -27,6 +27,7 @@ model Appliance {
 model Category {
   id          Int @id @default(autoincrement())
   name        String
+  icon        String?
   appliances  Appliance[]
   createdAt   DateTime  @default(now()) @map(name: "created_at")
   updatedAt   DateTime  @updatedAt @map(name: "updated_at")
