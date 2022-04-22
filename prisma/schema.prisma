@@ -13,16 +13,21 @@ datasource db {
 model Appliance {
   id          Int @id @default(autoincrement())
   name        String
+  volts       Float @default(0.0)
   amps        Float @default(0.0)
   watts       Float @default(0.0)
   hpd         Float @default(1.0)
-  category    Category @default(APPLIANCES)
+  rph         Int @default(0)
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  Int
   createdAt   DateTime  @default(now()) @map(name: "created_at")
   updatedAt   DateTime  @updatedAt @map(name: "updated_at")
 }
 
-enum Category {
-  APPLIANCES
-  TOOLS
-  PUMPS_AND_AIR_CONDITIONERS
+model Category {
+  id          Int @id @default(autoincrement())
+  name        String
+  appliances  Appliance[]
+  createdAt   DateTime  @default(now()) @map(name: "created_at")
+  updatedAt   DateTime  @updatedAt @map(name: "updated_at")
 }
