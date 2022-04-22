@@ -92,7 +92,7 @@ function Dashboard({ appliances }) {
   );
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const result = await prisma.appliance.findMany();
 
   const appliances = result.map((appliance) => ({
