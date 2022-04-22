@@ -4,6 +4,7 @@ import Field from '../../components/Field';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { shapeResponse } from '../../utils/calculatePower';
+import prisma from '../../lib/prisma';
 
 function Edit({ category }) {
   const [values, setValues] = useState({
