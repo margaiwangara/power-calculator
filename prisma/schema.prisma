@@ -17,7 +17,7 @@ model Appliance {
   amps        Float @default(0.0)
   watts       Float @default(0.0)
   hpd         Float @default(1.0)
-  rph         Float @default(0)
+  rph         Int @default(0)
   category    Category @relation(fields: [categoryId], references: [id])
   categoryId  Int
   createdAt   DateTime  @default(now()) @map(name: "created_at")

@@ -7,6 +7,7 @@ function Field({
   onChange,
   required,
   name,
+  hasDecimal = true,
 }) {
   return (
     <div className="field">
@@ -23,7 +24,7 @@ function Field({
           defaultValue={value}
           required={required}
           min={0}
-          step={0.1}
+          step={hasDecimal ? 0.1 : 1}
           name={name}
         />
       </div>

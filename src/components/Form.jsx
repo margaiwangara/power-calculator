@@ -122,6 +122,7 @@ function Form({ categories, item }) {
         value={values?.runsPerHour || 0}
         onChange={onChange}
         name="runsPerHour"
+        hasDecimal={false}
       />
       <button
         className={`button is-primary is-fullwidth${
