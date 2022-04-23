@@ -82,8 +82,6 @@ function Home({ appliances, categories }) {
     );
   };
 
-  console.log('items', items);
-
   return (
     <main className="has-background-light" id="wrapper">
       <HeadBoy title="Home" />
@@ -346,8 +344,6 @@ export async function getServerSideProps() {
     }),
   );
   const categories = categoryResults.map((category) => shapeResponse(category));
-
-  console.log('appliances', applianceResults);
 
   return {
     props: {

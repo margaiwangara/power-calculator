@@ -116,9 +116,9 @@ function Dashboard({ appliances, categories }) {
                   <tr key={appliance.id}>
                     <td>{appliance?.id}</td>
                     <td>{appliance?.name}</td>
-                    <td>{appliance?.watts}</td>
-                    <td>{appliance?.amps}</td>
-                    <td>{appliance?.volts}</td>
+                    <td>{appliance?.watts?.toFixed(1)}</td>
+                    <td>{appliance?.amps?.toFixed(1)}</td>
+                    <td>{appliance?.volts?.toFixed(1)}</td>
                     <td>{appliance?.hpd}</td>
                     <td className="is-capitalized">
                       {appliance?.category?.name}

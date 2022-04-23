@@ -5,8 +5,9 @@ import { useRouter } from 'next/router';
 function Form({ categories, item }) {
   const [values, setValues] = useState({
     name: item?.name || '',
-    volts: item?.volts || 0.0,
-    amps: item?.amps || 0.0,
+    watts: item?.watts?.toFixed(1) || 0.0,
+    volts: item?.volts?.toFixed(1) || 0.0,
+    amps: item?.amps?.toFixed(1) || 0.0,
     category: item?.categoryId || categories?.[0]?.id,
     hoursPerDay: item?.hpd || 1,
     runsPerHour: item?.rph || 0,
@@ -17,6 +18,44 @@ function Form({ categories, item }) {
 
   const onChange = (e) =>
     setValues({ ...values, [e.target.name]: e.target.value });
+
+  const calculateWAV = () => {
+    const { watts, volts, amps } = values;
+
+    const w = parseFloat(watts);
+    const a = parseFloat(amps);
+    const v = parseFloat(volts);
+
+    if (w === 0) {
+      return {
+        watts: a * v,
+        amps: a,
+        volts: v,
+      };
+    }
+
+    if (a === 0) {
+      return {
+        watts: w,
+        amps: w / v,
+        volts: v,
+      };
+    }
+
+    if (v === 0) {
+      return {
+        watts: w,
+        amps: a,
+        volts: w / a,
+      };
+    }
+
+    return {
+      watts: w,
+      amps: a,
+      volts: v,
+    };
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -30,9 +69,7 @@ function Form({ categories, item }) {
         },
         body: JSON.stringify({
           ...values,
-          amps: parseFloat(values.amps),
-          volts: parseFloat(values.volts),
-          watts: parseFloat(values.amps) * parseFloat(values.volts),
+          ...calculateWAV(),
           hpd: parseFloat(values.hoursPerDay),
           rph: parseFloat(values.runsPerHour),
           category: parseInt(values.category),
@@ -65,6 +102,15 @@ function Form({ categories, item }) {
         onChange={onChange}
         required={true}
         name="name"
+      />
+      <Field
+        type="number"
+        placeholder="Watts"
+        label="Watts"
+        value={values?.watts || 0.0}
+        onChange={onChange}
+        required={true}
+        name="watts"
       />
       <Field
         type="number"
